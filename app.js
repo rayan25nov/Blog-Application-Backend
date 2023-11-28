@@ -1,6 +1,7 @@
 import express from "express";
 const app = express();
 import dotenv from "dotenv";
+import cors from "cors";
 import cookieParser from "cookie-parser";
 dotenv.config();
 
@@ -11,6 +12,7 @@ dbConnection();
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 // Importing the Routes
 import userRoutes from "./routes/userRoute.js";

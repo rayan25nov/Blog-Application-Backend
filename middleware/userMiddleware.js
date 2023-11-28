@@ -3,22 +3,18 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const requireAuth = (req, res, next) => {
-  const token = req.cookies.jwt;
-
-  // check json web token exists & is verified
-  if (token) {
-    jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
-      if (err) {
-        console.log(err.message);
-        res.redirect("/signin");
-      } else {
-        console.log(decodedToken);
-        next();
-      }
-    });
-  } else {
-    res.redirect("/signin");
+  const cookie = req.cookies.jwt;
+  if (!cookie) {
+    return res.status(401).json({ message: "No token in cookie" });
   }
+  jwt.verify(cookie, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    // If the token is valid, set the user in the request and call the next middleware
+    req.user = decoded;
+    next();
+  });
 };
 
 export default requireAuth;

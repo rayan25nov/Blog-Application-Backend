@@ -11,7 +11,7 @@ const signupHandler = async (req, res) => {
     const newUser = await user.save();
     const token = createToken(newUser._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
-    res.status(201).json({ user: user._id });
+    res.status(200).json({ user: user._id, token });
   } catch (err) {
     const errors = handleErrors(err);
     res.status(400).json({ errors });
@@ -24,12 +24,30 @@ const signinHandler = async (req, res) => {
     const user = await User.login(email, password);
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
-    res.status(200).json({ user: user._id });
+    res.status(200).json({ user: user._id, token });
   } catch (error) {
     const errors = handleErrors(error);
     res.status(400).json({ errors });
   }
 };
+// Authentication Handler to handle authentication related functionality
+const isAuthenticate = (req, res) => {
+  const token = req.cookies.jwt;
+  // token is not present
+  if (!token) {
+    return res.json({ isAuthenticated: false });
+  }
+  // verify token
+  jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+    if (err) {
+      return res.json({ isAuthenticated: false });
+    }
+
+    // Token is valid
+    return res.json({ isAuthenticated: true, user: decodedToken.id });
+  });
+};
+
 
 // logout handler
 const logoutHandler = (req, res) => {
@@ -37,7 +55,7 @@ const logoutHandler = (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
 
-
+/////////////////////////////////////////////////////////////////////
 // create json web token
 const maxAge = 3 * 24 * 60 * 60;
 const createToken = (id) => {
@@ -75,4 +93,4 @@ const handleErrors = (err) => {
   return errors;
 };
 
-export { signinHandler, signupHandler, logoutHandler };
+export { signinHandler, signupHandler, logoutHandler, isAuthenticate };
