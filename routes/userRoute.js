@@ -1,23 +1,24 @@
 import express from "express";
 const router = express.Router();
 import {
+  sendOtp,
   signinHandler,
   signupHandler,
   logoutHandler,
-  isAuthenticate,
+  verifyToken,
 } from "../controllers/userController.js";
 
-//Route for check authentication
-router.get("/check-auth", isAuthenticate);
+// middlewares
+import {
+  requireAuth,
+  requireAdmin,
+  requireUser,
+} from "../middleware/userMiddleware.js";
 
-// Route for user registration (sign-up)
-router.post("/signup", signupHandler);
-
-// Route for user login (sign-in)
+router.post("/sendotp", sendOtp);
 router.post("/signin", signinHandler);
-
-//Route for user logout
-router.get("/logout", logoutHandler);
-
+router.post("/signup", signupHandler);
+router.post("/logout", logoutHandler);
+router.get("/:id/verify/:token/", verifyToken);
 
 export default router;
