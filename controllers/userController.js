@@ -1,82 +1,32 @@
 import User from "../model/userModel.js";
-import Otp from "../model/otpModel.js";
 import Token from "../model/tokenModel.js";
+import mailSender from "../utils/mailSender.js";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { customAlphabet } from "nanoid";
-import isvalidate from "validator";
+import validator from "validator";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 dotenv.config();
-
-// @desc      Send OTP for email verification
-// @route     POST /users/sendotp
-// @access    Public // VERIFIED
-const sendOtp = async (req, res) => {
-  const { email } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (user) {
-      return res
-        .status(401)
-        .json({ error: "User Already registered", success: false });
-    }
-    // Function to generate a random OTP of a specified length
-    const generateOTP = (length) => {
-      const alphabet = "0123456789abcdef";
-      const nanoid = customAlphabet(alphabet, length);
-      return nanoid();
-    };
-
-    // Example: Generate a 6-digit OTP
-    const otp = generateOTP(6);
-    console.log(otp);
-    // Save OTP to database
-    const otpData = new Otp({
-      email,
-      otp,
-    });
-    await otpData.save();
-    // Send response to user
-    res
-      .status(200)
-      .json({ success: true, message: "Otp sent successfully", otp });
-  } catch (error) {
-    res.status(500).json({ error: error.message, success: false });
-  }
-};
 
 // @desc      SignUp a user
 // @route     POST /users/signup
 // @access    Public // VERIFIED
 const signupHandler = async (req, res) => {
   try {
-    const { name, email, password, role, otp } = req.body;
-    console.log(otp);
-    if (!email || !isvalidate.isEmail(email)) {
-      return res.status(400).json({ error: "Invalid email", success: false });
-    }
-    // find most recent otp
-    const recentOtp = await Otp.findOne({ email })
-      .sort({ createdAt: -1 })
-      .limit(1);
-    console.log(recentOtp);
-    // check if otp is valid
-    if (!recentOtp) {
-      // Otp not found
-      return res.status(401).json({ error: "OTP not found", success: false });
-    } else if (recentOtp.otp != otp) {
-      // Otp is invalid
-      return res.status(401).json({ error: "Invalid OTP", success: false });
+    const { name, email, password, role } = req.body;
+    if (validator.isEmail(email) === false) {
+      return res.status(400).json({
+        errors: { email: "Invalid Email" },
+        success: false,
+      });
     }
     // check if user already exists
     if (await User.findOne({ email })) {
       return res.status(400).json({
-        error: "User already exists",
+        errors: { user: "User already exists" },
         success: false,
       });
     }
-
-    console.log();
     let hashedPassword = "";
     if (password.length >= 6) {
       hashedPassword = await bcrypt.hash(password, 10);
@@ -91,19 +41,19 @@ const signupHandler = async (req, res) => {
     });
 
     const newUser = await user.save();
-    // generate cookie
-    const token = createToken({ id: newUser._id, role: newUser.role });
+    const token = await new Token({
+      userId: newUser._id,
+      token: crypto.randomBytes(32).toString("hex"),
+    }).save();
+    const url = `${process.env.BASE_URL}users/${newUser.id}/verify/${token.token}`;
+    await mailSender(newUser.email, "Verify Email", url);
+
     res
-      .cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 })
-      .status(200)
-      .json({
-        message: "User created successfully",
-        success: true,
-        token,
-      });
+      .status(201)
+      .send({ message: "An Email sent to your account please verify" });
   } catch (err) {
     const errors = handleErrors(err);
-    res.status(400).json(errors);
+    res.status(400).json({ errors, success: false });
   }
 };
 
@@ -119,11 +69,15 @@ const verifyToken = async (req, res) => {
     if (!token) return res.status(400).send({ message: "Invalid link" });
 
     await User.updateOne({ _id: user._id, verified: true });
-    await token.remove();
+    await Token.deleteOne({ userId: user._id });
 
     res.status(200).send({ message: "Email verified successfully" });
   } catch (error) {
-    res.status(500).send({ message: "Internal Server Error" });
+    res.status(500).send({
+      message: "Internal Server Error",
+      success: false,
+      error: error.message,
+    });
   }
 };
 // @desc      Login user
@@ -148,6 +102,23 @@ const signinHandler = async (req, res) => {
         success: false,
       });
     }
+    // Sending Email if User not verified
+    if (!user.verified) {
+      let token = await Token.findOne({ userId: user._id });
+      if (!token) {
+        token = await new Token({
+          userId: user._id,
+          token: crypto.randomBytes(32).toString("hex"),
+        }).save();
+        const url = `${process.env.BASE_URL}users/${user.id}/verify/${token.token}`;
+        await sendEmail(user.email, "Verify Email", url);
+      }
+
+      return res.status(400).send({
+        message: "An Email sent to your account please verify",
+        success: true,
+      });
+    }
     // generate cookie
     const token = createToken({ id: user._id, role: user.role });
     res
@@ -160,7 +131,7 @@ const signinHandler = async (req, res) => {
       });
   } catch (err) {
     const errors = handleErrors(err);
-    res.status(400).json(errors);
+    res.status(400).json({ errors, success: false });
   }
 };
 
@@ -221,4 +192,4 @@ const handleErrors = (err) => {
   }, {});
 };
 
-export { sendOtp, signupHandler, signinHandler, logoutHandler, verifyToken };
+export { signupHandler, signinHandler, logoutHandler, verifyToken };

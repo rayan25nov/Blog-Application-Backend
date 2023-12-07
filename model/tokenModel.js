@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const tokenSchema = new mongoose.Schema({
   userId: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: "user",
     unique: true,

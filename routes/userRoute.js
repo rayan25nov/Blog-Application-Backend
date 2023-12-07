@@ -1,7 +1,6 @@
 import express from "express";
 const router = express.Router();
 import {
-  sendOtp,
   signinHandler,
   signupHandler,
   logoutHandler,
@@ -15,7 +14,7 @@ import {
   requireUser,
 } from "../middleware/userMiddleware.js";
 
-router.post("/sendotp", sendOtp);
+// router.post("/sendotp", sendOtp);
 router.post("/signin", signinHandler);
 router.post("/signup", signupHandler);
 router.post("/logout", logoutHandler);
