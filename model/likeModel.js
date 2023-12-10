@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 
 const likeSchema = mongoose.Schema({
-  post: {
+  postId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Post",
   },
-  user: {
+  userId: {
     type: String,
     required: true,
   },
 });
 
-module.exports = mongoose.model("Like", likeSchema);
+export default mongoose.model("Like", likeSchema);

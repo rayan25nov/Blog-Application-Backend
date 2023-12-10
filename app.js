@@ -14,9 +14,13 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 
-// Importing the Routes
+// Importing the user Routes
 import userRoutes from "./routes/userRoute.js";
 app.use("/users", userRoutes);
+
+//Importing the Post Routes
+import postRoutes from "./routes/postRoute.js";
+app.use("/posts", postRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

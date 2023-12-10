@@ -7,12 +7,6 @@ import {
   verifyToken,
 } from "../controllers/userController.js";
 
-// middlewares
-import {
-  requireAuth,
-  requireAdmin,
-  requireUser,
-} from "../middleware/userMiddleware.js";
 
 // router.post("/sendotp", sendOtp);
 router.post("/signin", signinHandler);

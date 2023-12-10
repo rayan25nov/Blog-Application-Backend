@@ -5,12 +5,17 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  body: {
+  description: {
     type: String,
     required: true,
   },
   image: {
     type: String,
+    required: true,
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
   likes: [
@@ -27,4 +32,4 @@ const postSchema = new mongoose.Schema({
   ],
 });
 
-module.exports = mongoose.model("Post", postSchema);
+export default mongoose.model("Post", postSchema);
