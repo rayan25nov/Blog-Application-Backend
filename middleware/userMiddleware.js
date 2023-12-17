@@ -4,10 +4,11 @@ dotenv.config();
 
 const requireAuth = async (req, res, next) => {
   try {
+    // console.log(req.headers);
     const token =
       req.cookies.jwt ||
       req.body.token ||
-      req.header("Authorisation").replace("Bearer", "");
+      req.headers.authorization.replace("Bearer ", "");
     if (!token) {
       return res
         .status(401)

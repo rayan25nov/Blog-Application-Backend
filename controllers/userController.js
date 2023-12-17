@@ -192,4 +192,37 @@ const handleErrors = (err) => {
   }, {});
 };
 
-export { signupHandler, signinHandler, logoutHandler, verifyToken };
+const getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Use populate to get the posts, comments, and likes data
+    const user = await User.findById(userId)
+      .populate("posts") // Assuming 'posts' is the path to the Posts collection
+      .populate("comments") // Assuming 'comments' is the path to the Comments collection
+      .populate("likes"); // Assuming 'likes' is the path to the Likes collection
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    console.log(user.image);
+
+    res.status(200).json({
+      message: "User found successfully",
+      success: true,
+      user,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
+export { signupHandler, signinHandler, logoutHandler, verifyToken, getProfile };

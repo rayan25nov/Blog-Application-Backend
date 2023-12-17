@@ -2,20 +2,28 @@ import Post from "../model/postModel.js";
 import Like from "../model/likeModel.js";
 import Comment from "../model/commentModel.js";
 import User from "../model/userModel.js";
+import cloudinaryMiddleware from "../middleware/cloudinaryMiddleware.js";
 
 const createPost = async (req, res) => {
   try {
-    const { title, description, image } = req.body;
-    // userId
+    const { title, description, createdAt } = req.body;
     const userId = req.user.id;
-    // Create a new post object
+    // Call the uploadImage middleware with async/await
+    await cloudinaryMiddleware.uploadImage(req, res);
+
+    // Check if the upload was successful
+    const uploadResult = res.locals.uploadResult;
+
+    const imageUrl = uploadResult.imageUrl;
     const post = new Post({
       title,
       description,
-      image,
+      image: imageUrl,
       userId,
+      createdAt
     });
     const newPost = await post.save();
+
     // Update the user's posts array
     const user = await User.findById(userId);
     if (!user) {
@@ -90,14 +98,12 @@ const getPostById = async (req, res) => {
 const updatePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-
     if (!post) {
       return res.status(404).json({
         success: false,
         message: "Post not found",
       });
     }
-
     // Check if the authenticated user is the creator of the post
     if (post.userId.toString() !== req.user.id.toString()) {
       return res.status(403).json({
@@ -105,7 +111,20 @@ const updatePost = async (req, res) => {
         message: "You are not authorized to update this post",
       });
     }
+    // Check if a new image file is provided in the request
+    const newImageFile = req.files?.image;
+    if (newImageFile) {
+      // Call the deleteImage middleware with async/await
+      await cloudinaryMiddleware.deleteImage(post.image);
+      // Call the uploadImage middleware with async/await
+      await cloudinaryMiddleware.uploadImage(req, res);
+      // Check if the upload was successful
+      const uploadResult = res.locals.uploadResult;
+      // Save the Cloudinary image URL to the updated post
+      req.body.image = uploadResult.imageUrl;
+    }
 
+    // Update the post with the new data
     const updatedPost = await Post.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
@@ -142,6 +161,8 @@ const deletePost = async (req, res) => {
         message: "You are not authorized to delete this post",
       });
     }
+    // Call the deleteImage middleware with async/await
+    await cloudinaryMiddleware.deleteImage(post.image);
 
     await post.deleteOne();
 
@@ -330,7 +351,6 @@ const deleteComment = async (req, res) => {
     });
   }
 };
-
 
 export {
   getAllPosts,

@@ -3,16 +3,26 @@ const app = express();
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import fileUpload from "express-fileupload";
 dotenv.config();
 
 // Importing the Database Connection
 import dbConnection from "./db/config.js";
 dbConnection();
+// Importing the Cloudinary Connection
+import cloudinaryConnect from "./db/cloudinary.js";
+cloudinaryConnect();
 
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
+);
 
 // Importing the user Routes
 import userRoutes from "./routes/userRoute.js";

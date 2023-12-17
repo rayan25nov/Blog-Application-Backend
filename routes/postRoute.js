@@ -20,6 +20,8 @@ import {
   requireAdmin,
   requireUser,
 } from "../middleware/userMiddleware.js";
+// import singleUpload from "../middleware/multer.js";
+import uploadImage from "../middleware/cloudinaryMiddleware.js";
 
 router.get("/", requireAuth, getAllPosts);
 router.post("/create", requireAuth, createPost);
