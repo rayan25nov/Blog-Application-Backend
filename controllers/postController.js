@@ -51,14 +51,23 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
   try {
+    const { page = 1, pageSize = 10 } = req.query;
+
+    const totalPosts = await Post.countDocuments();
+    const totalPages = Math.ceil(totalPosts / pageSize);
+
     const posts = await Post.find()
       .populate("comments")
       .populate("likes")
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
       .exec();
+
     res.status(200).json({
       success: true,
       message: "Posts fetched successfully",
       posts,
+      totalPages,
     });
   } catch (err) {
     res.status(500).json({
@@ -68,6 +77,8 @@ const getAllPosts = async (req, res) => {
     });
   }
 };
+
+
 
 const getPostById = async (req, res) => {
   try {
