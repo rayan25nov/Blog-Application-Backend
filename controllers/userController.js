@@ -59,22 +59,35 @@ const signupHandler = async (req, res) => {
 
 const verifyToken = async (req, res) => {
   try {
+    console.log(req.params.id);
+    console.log(req.params.token);
     const user = await User.findOne({ _id: req.params.id });
-    if (!user) return res.status(400).send({ message: "Invalid link" });
+    if (!user) {
+      return res.status(400).send({
+        message: "User doesn't found",
+        success: false,
+      });
+    }
 
     const token = await Token.findOne({
       userId: user._id,
       token: req.params.token,
     });
-    if (!token) return res.status(400).send({ message: "Invalid link" });
+    console.log(token);
+    if (!token) {
+      return res.status(400).send({
+        message: "Token doesn't exist",
+        success: false,
+      });
+    }
 
-    await User.updateOne({ _id: user._id, verified: true });
+    await User.updateOne({ _id: user._id }, { $set: { verified: true } });
     await Token.deleteOne({ userId: user._id });
 
     res.status(200).send({ message: "Email verified successfully" });
   } catch (error) {
     res.status(500).send({
-      message: "Internal Server Error",
+      message: "Internal Server Error Token not verified",
       success: false,
       error: error.message,
     });
@@ -90,7 +103,7 @@ const signinHandler = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({
-        error: "User not found",
+        message: "User not found",
         success: false,
       });
     }
@@ -98,7 +111,7 @@ const signinHandler = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.status(401).json({
-        error: "Wrong password",
+        message: "Wrong password",
         success: false,
       });
     }
@@ -116,10 +129,10 @@ const signinHandler = async (req, res) => {
 
       return res.status(400).send({
         message: "An Email sent to your account please verify",
-        success: true,
+        success: false,
       });
     }
-    // generate cookie
+    // generate cookie using JWT
     const token = createToken({ id: user._id, role: user.role });
     res
       .cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 })

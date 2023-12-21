@@ -5,7 +5,7 @@ import {
   signupHandler,
   logoutHandler,
   verifyToken,
-  getProfile
+  getProfile,
 } from "../controllers/userController.js";
 
 // middleware
@@ -15,12 +15,11 @@ import {
   requireUser,
 } from "../middleware/userMiddleware.js";
 
-
 // router.post("/sendotp", sendOtp);
 router.post("/signin", signinHandler);
 router.post("/signup", signupHandler);
 router.post("/logout", logoutHandler);
-router.get("/:id/verify/:token/", verifyToken);
+router.get("/:id/verify/:token", verifyToken);
 router.get("/profile", requireAuth, getProfile);
 
 export default router;
