@@ -20,7 +20,7 @@ const createPost = async (req, res) => {
       description,
       image: imageUrl,
       userId,
-      createdAt
+      createdAt,
     });
     const newPost = await post.save();
 
@@ -77,8 +77,6 @@ const getAllPosts = async (req, res) => {
     });
   }
 };
-
-
 
 const getPostById = async (req, res) => {
   try {
@@ -294,7 +292,8 @@ const unlikePost = async (req, res) => {
 
 const commentPost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.postId);
+    console.log(post);
     if (!post) {
       return res.status(404).json({
         success: false,
@@ -363,6 +362,25 @@ const deleteComment = async (req, res) => {
   }
 };
 
+const getAllComments = async (req, res) => {
+  try {
+    const comments = await Comment.find().populate("userId").exec();
+    const user = await User.findById(req.user.id);
+    res.status(200).json({
+      success: true,
+      message: "Comments fetched successfully",
+      comments,
+      name: user.name,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+};
+
 export {
   getAllPosts,
   createPost,
@@ -374,4 +392,5 @@ export {
   unlikePost,
   commentPost,
   deleteComment,
+  getAllComments,
 };

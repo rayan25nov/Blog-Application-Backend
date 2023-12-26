@@ -12,6 +12,7 @@ import {
   unlikePost,
   commentPost,
   deleteComment,
+  getAllComments,
 } from "../controllers/postController.js";
 
 // middlewares
@@ -33,7 +34,8 @@ router.get("/user/:id", getPostsByUserId);
 router.put("/like/:id", requireAuth, likePost);
 router.put("/unlike/:id", requireAuth, unlikePost);
 
-router.put("/comment/:id", requireAuth, commentPost);
-router.delete("/comment/:id/:commentId", requireAuth, deleteComment);
+router.put("/comment/:postId", requireAuth, commentPost);
+router.delete("/comment/:postId/:commentId", requireAuth, deleteComment);
+router.get("/comment/:postId", requireAuth, getAllComments);
 
 export default router;
