@@ -180,6 +180,11 @@ const deletePost = async (req, res) => {
     user.posts.pull(req.params.id);
     await user.save();
 
+    // Delete all comments associated with the post
+    await Comment.deleteMany({ postId: req.params.id });
+    // Delete all likes associated with the post
+    await Like.deleteMany({ postId: req.params.id });
+    // Send Request after sucessfull deletion of post
     res.status(200).json({
       success: true,
       message: "Post deleted successfully",
@@ -293,7 +298,7 @@ const unlikePost = async (req, res) => {
 const commentPost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.postId);
-    console.log(post);
+    // console.log(post);
     if (!post) {
       return res.status(404).json({
         success: false,
@@ -331,14 +336,25 @@ const commentPost = async (req, res) => {
 
 const deleteComment = async (req, res) => {
   try {
-    const comment = await Comment.findByIdAndDelete(req.params.commentId);
+    const comment = await Comment.findById(req.params.commentId);
+    console.log(comment);
     if (!comment) {
       return res.status(404).json({
         success: false,
         message: "Comment not found",
       });
     }
-
+    
+    // Check if the authenticated user is the creator of the comment
+    if (comment.userId.toString() !== req.user.id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this comment",
+      });
+    }
+    // Delete comment from comment collection
+    await comment.deleteOne();
+    
     // Remove comment from post collection
     const post = await Post.findById(comment.postId);
     post.comments.pull(comment._id);
