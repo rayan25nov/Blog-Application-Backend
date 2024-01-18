@@ -13,7 +13,7 @@ import {
   getAllLikes,
   commentPost,
   deleteComment,
-  getAllComments,
+  getAllCommentsForSpecificPost,
 } from "../controllers/postController.js";
 
 // middlewares
@@ -43,6 +43,6 @@ router.get("/likes/:id", requireAuth, getAllLikes);
 // All the comments related Routes
 router.put("/comment/:postId", requireAuth, commentPost);
 router.delete("/comment/:postId/:commentId", requireAuth, deleteComment);
-router.get("/comment/:postId", requireAuth, getAllComments);
+router.get("/comment/:postId", requireAuth, getAllCommentsForSpecificPost);
 
 export default router;

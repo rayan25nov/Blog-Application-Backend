@@ -275,7 +275,7 @@ const unlikePost = async (req, res) => {
       postId: req.params.id,
       userId: req.user.id,
     });
-    // Check if the user has liked the post
+    // When User have not liked the post
     if (!like) {
       return res.status(400).json({
         success: false,
@@ -409,24 +409,24 @@ const deleteComment = async (req, res) => {
   }
 };
 
-const getAllComments = async (req, res) => {
+const getAllCommentsForSpecificPost = async (req, res) => {
   try {
-    const comments = await Comment.find().populate("userId").exec();
-    const user = await User.findById(req.user.id);
+    const comments = await Comment.find({ postId: req.params.postId })
+      .populate("userId")
+      .exec();
     res.status(200).json({
       success: true,
       message: "Comments fetched successfully",
       comments,
-      name: user.name,
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Error while fetching Comments",
       error: err.message,
     });
   }
-};
+}
 
 export {
   getAllPosts,
@@ -440,5 +440,5 @@ export {
   getAllLikes,
   commentPost,
   deleteComment,
-  getAllComments,
+  getAllCommentsForSpecificPost,
 };
