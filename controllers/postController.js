@@ -227,7 +227,19 @@ const likePost = async (req, res) => {
         message: "Post not found",
       });
     }
+    // Check if the user has already liked the post
+    const existingLike = await Like.findOne({
+      postId: post._id,
+      userId: req.user.id,
+    });
 
+    if (existingLike) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already liked this post",
+      });
+    }
+    // If the user has not liked the post, proceed with liking
     const like = new Like({
       postId: post._id,
       userId: req.user.id,
@@ -263,16 +275,18 @@ const unlikePost = async (req, res) => {
       postId: req.params.id,
       userId: req.user.id,
     });
+    // Check if the user has liked the post
     if (!like) {
-      return res.status(404).json({
+      return res.status(400).json({
         success: false,
-        message: "Like not found",
+        message: "You have not liked this post",
       });
     }
-    // delete like from like collection
+
+    // Delete like from like collection
     await like.deleteOne();
 
-    // delete like from post collection
+    // Delete like from post collection
     const post = await Post.findById(req.params.id);
     post.likes.pull(like._id);
     await post.save();
@@ -289,7 +303,24 @@ const unlikePost = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Error During Unliking the post",
+      error: err.message,
+    });
+  }
+};
+
+const getAllLikes = async (req, res) => {
+  try {
+    const likes = await Like.find({ postId: req.params.id });
+    res.status(200).json({
+      success: true,
+      message: "Likes fetched successfully",
+      likes,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Error while fetching post",
       error: err.message,
     });
   }
@@ -344,7 +375,7 @@ const deleteComment = async (req, res) => {
         message: "Comment not found",
       });
     }
-    
+
     // Check if the authenticated user is the creator of the comment
     if (comment.userId.toString() !== req.user.id.toString()) {
       return res.status(403).json({
@@ -354,7 +385,7 @@ const deleteComment = async (req, res) => {
     }
     // Delete comment from comment collection
     await comment.deleteOne();
-    
+
     // Remove comment from post collection
     const post = await Post.findById(comment.postId);
     post.comments.pull(comment._id);
@@ -406,6 +437,7 @@ export {
   getPostsByUserId,
   likePost,
   unlikePost,
+  getAllLikes,
   commentPost,
   deleteComment,
   getAllComments,
