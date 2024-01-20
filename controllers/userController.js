@@ -57,10 +57,13 @@ const signupHandler = async (req, res) => {
   }
 };
 
+// @desc      Verify user
+// @route     GET /users/:id/verify/:token
+// @access    Public  // VERIFIED
 const verifyToken = async (req, res) => {
   try {
-    console.log(req.params.id);
-    console.log(req.params.token);
+    // console.log(req.params.id);
+    // console.log(req.params.token);
     const user = await User.findOne({ _id: req.params.id });
     if (!user) {
       return res.status(400).send({
@@ -73,7 +76,7 @@ const verifyToken = async (req, res) => {
       userId: user._id,
       token: req.params.token,
     });
-    console.log(token);
+    // console.log(token);
     if (!token) {
       return res.status(400).send({
         message: "Token doesn't exist",
@@ -163,7 +166,6 @@ const logoutHandler = (req, res) => {
 };
 
 const maxAge = 3 * 24 * 60 * 60;
-
 // Function to create a JWT token
 const createToken = (user) => {
   return jwt.sign(user, process.env.JWT_SECRET, {
@@ -222,7 +224,7 @@ const getProfile = async (req, res) => {
       });
     }
 
-    console.log(user.image);
+    // console.log(user.image);
 
     res.status(200).json({
       message: "User found successfully",
@@ -238,4 +240,94 @@ const getProfile = async (req, res) => {
   }
 };
 
-export { signupHandler, signinHandler, logoutHandler, verifyToken, getProfile };
+// @desc      Forgot password
+// @route     POST /users/forgot-password
+// @access    Public  // VERIFIED
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+    // Check if a reset token already exists for the user
+    const existingToken = await Token.findOne({ userId: user._id });
+
+    if (existingToken) {
+      return res.status(409).json({
+        message: "An Email is Already been sent to reset the password",
+        success: false,
+      });
+    }
+    const token = await new Token({
+      userId: user._id,
+      token: crypto.randomBytes(32).toString("hex"),
+    }).save();
+    const url = `${process.env.BASE_URL}users/${user.id}/reset-password/${token.token}`;
+    await mailSender(user.email, "Reset Password", url);
+    res.status(200).json({
+      message: "Password reset link sent to your email",
+      success: true,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error ocuured during sending mail to reset the password",
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
+// @desc      Reset password
+// @route     POST /users/:id/reset-password/:token
+// @access    Public  // VERIFIED
+const resetPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+    const token = await Token.findOne({
+      userId: user._id,
+      token: req.params.token,
+    });
+    if (!token) {
+      return res.status(400).send({
+        message: "Token doesn't exist",
+        success: false,
+      });
+    }
+    let hashedPassword = "";
+    if (password.length >= 6) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+    await User.updateOne(
+      { _id: user._id },
+      { $set: { password: hashedPassword } }
+    );
+    await Token.deleteOne({ userId: user._id });
+    res.status(200).send({ message: "Password reset successfully" });
+  } catch (error) {
+    res.status(500).send({
+      message: "Error occur during resetting the password",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+export {
+  signupHandler,
+  signinHandler,
+  logoutHandler,
+  verifyToken,
+  getProfile,
+  forgotPassword,
+  resetPassword,
+};

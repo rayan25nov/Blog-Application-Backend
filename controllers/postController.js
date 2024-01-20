@@ -368,7 +368,7 @@ const commentPost = async (req, res) => {
 const deleteComment = async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.commentId);
-    console.log(comment);
+    // console.log(comment);
     if (!comment) {
       return res.status(404).json({
         success: false,

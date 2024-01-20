@@ -6,6 +6,8 @@ import {
   logoutHandler,
   verifyToken,
   getProfile,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/userController.js";
 
 // middleware
@@ -21,5 +23,7 @@ router.post("/signup", signupHandler);
 router.post("/logout", logoutHandler);
 router.get("/:id/verify/:token", verifyToken);
 router.get("/profile", requireAuth, getProfile);
+router.post("/forgot-password", forgotPassword);
+router.post("/:id/reset-password/:token", resetPassword);
 
 export default router;

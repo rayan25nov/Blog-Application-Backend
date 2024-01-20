@@ -15,11 +15,11 @@ const requireAuth = async (req, res, next) => {
         .json({ message: "No token in cookie", success: false });
     }
     const decode = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decode);
+    // console.log(decode);
     req.user = decode;
     next();
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(401).json({ message: "Invalid token", success: false });
   }
 };
@@ -34,7 +34,7 @@ const requireAdmin = (req, res, next) => {
     }
     next();
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res
       .status(401)
       .json({ message: "User role cannot be verified", success: false });
@@ -50,7 +50,7 @@ const requireUser = (req, res, next) => {
     }
     next();
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res
       .status(401)
       .json({ message: "User role cannot be verified", success: false });
