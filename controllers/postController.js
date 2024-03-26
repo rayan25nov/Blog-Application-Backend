@@ -13,8 +13,8 @@ const createPost = async (req, res) => {
 
     // Check if the upload was successful
     const uploadResult = res.locals.uploadResult;
-
     const imageUrl = uploadResult.imageUrl;
+    
     const post = new Post({
       title,
       description,
