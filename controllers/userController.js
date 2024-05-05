@@ -46,7 +46,12 @@ const signupHandler = async (req, res) => {
       token: crypto.randomBytes(32).toString("hex"),
     }).save();
     const url = `${process.env.BASE_URL}users/${newUser.id}/verify/${token.token}`;
-    await mailSender(newUser.email, "Verify Email", url);
+    await mailSender(
+      newUser.email,
+      "To complete your registration, please verify your email address by clicking the button below:",
+      url,
+      "Verify Email"
+    );
 
     res
       .status(201)
@@ -267,7 +272,12 @@ const forgotPassword = async (req, res) => {
       token: crypto.randomBytes(32).toString("hex"),
     }).save();
     const url = `${process.env.BASE_URL}users/${user.id}/reset-password/${token.token}`;
-    await mailSender(user.email, "Reset Password", url);
+    await mailSender(
+      user.email,
+      "You have requested to reset your password. Please click the button below to set a new password:",
+      url,
+      "Reset Password"
+    );
     res.status(200).json({
       message: "Password reset link sent to your email",
       success: true,
