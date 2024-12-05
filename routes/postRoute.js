@@ -14,6 +14,7 @@ import {
   commentPost,
   deleteComment,
   getAllCommentsForSpecificPost,
+  getAllPostIdForSpecificUser,
 } from "../controllers/postController.js";
 
 // middlewares
@@ -23,7 +24,7 @@ import {
   requireUser,
 } from "../middleware/userMiddleware.js";
 // import singleUpload from "../middleware/multer.js";
-import uploadImage from "../middleware/cloudinaryMiddleware.js";
+// import uploadImage from "../middleware/cloudinaryMiddleware.js";
 
 // Post Related Routes
 router.get("/", getAllPosts);
@@ -33,6 +34,7 @@ router.put("/:id", requireAuth, updatePost);
 router.delete("/:id", requireAuth, deletePost);
 
 // Post by user Id
+router.get("/user/postId", requireAuth, getAllPostIdForSpecificUser);
 router.get("/user/:id", getPostsByUserId);
 
 // All the likes related Routes

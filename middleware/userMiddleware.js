@@ -15,7 +15,7 @@ const requireAuth = async (req, res, next) => {
         .json({ message: "No token in cookie", success: false });
     }
     const decode = jwt.verify(token, process.env.JWT_SECRET);
-    // console.log(decode);
+    console.log(decode);
     req.user = decode;
     next();
   } catch (error) {

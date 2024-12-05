@@ -14,7 +14,7 @@ const createPost = async (req, res) => {
     // Check if the upload was successful
     const uploadResult = res.locals.uploadResult;
     const imageUrl = uploadResult.imageUrl;
-    
+
     const post = new Post({
       title,
       description,
@@ -51,23 +51,24 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
   try {
-    const { page = 1, pageSize = 10 } = req.query;
+    // const { page = 1, pageSize = 10 } = req.query;
 
-    const totalPosts = await Post.countDocuments();
-    const totalPages = Math.ceil(totalPosts / pageSize);
+    // const totalPosts = await Post.countDocuments();
+    // const totalPages = Math.ceil(totalPosts / pageSize);
 
     const posts = await Post.find()
       .populate("comments")
       .populate("likes")
-      .skip((page - 1) * pageSize)
-      .limit(pageSize)
-      .exec();
+      .populate("userId");
+    // .skip((page - 1) * pageSize)
+    // .limit(pageSize)
+    // .exec();
 
     res.status(200).json({
       success: true,
       message: "Posts fetched successfully",
       posts,
-      totalPages,
+      // totalPages,
     });
   } catch (err) {
     res.status(500).json({
@@ -81,6 +82,7 @@ const getAllPosts = async (req, res) => {
 const getPostById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
+      .populate("userId")
       .populate("comments")
       .populate("likes")
       .exec();
@@ -426,8 +428,26 @@ const getAllCommentsForSpecificPost = async (req, res) => {
       error: err.message,
     });
   }
-}
+};
 
+const getAllPostIdForSpecificUser = async (req, res) => {
+  try {
+    const posts = await Post.find({ userId: req.user.id });
+    const postIds = posts.map((post) => post._id);
+
+    res.status(200).json({
+      success: true,
+      message: "Post IDs fetched successfully",
+      postIds,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Error while fetching Post IDs",
+      error: err.message,
+    });
+  }
+};
 export {
   getAllPosts,
   createPost,
@@ -441,4 +461,5 @@ export {
   commentPost,
   deleteComment,
   getAllCommentsForSpecificPost,
+  getAllPostIdForSpecificUser,
 };
