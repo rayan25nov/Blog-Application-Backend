@@ -56,14 +56,14 @@ const getAllPosts = async (req, res) => {
     // const totalPosts = await Post.countDocuments();
     // const totalPages = Math.ceil(totalPosts / pageSize);
 
-    const posts = await Post.find()
-      .populate("comments")
-      .populate("likes")
-      .populate("userId");
+    const posts = await Post.find().populate("comments").populate("likes");
+    // .populate("userId");
     // .skip((page - 1) * pageSize)
     // .limit(pageSize)
     // .exec();
 
+    // reverse the posts
+    posts.reverse();
     res.status(200).json({
       success: true,
       message: "Posts fetched successfully",
