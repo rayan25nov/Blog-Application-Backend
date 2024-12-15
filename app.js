@@ -21,14 +21,13 @@ dbConnection();
 import cloudinaryConnect from "./db/cloudinary.js";
 cloudinaryConnect();
 
+// Swagger setup
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Serve static files from node_modules/swagger-ui-dist
 app.use(
   "/api-docs",
   express.static(path.join(__dirname, "node_modules", "swagger-ui-dist"))
 );
-
-// Swagger setup
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Middlewares
 app.use(express.json());
