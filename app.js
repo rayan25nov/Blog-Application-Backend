@@ -5,6 +5,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 dotenv.config();
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./swagger.js";
 
 // Importing the Database Connection
 import dbConnection from "./db/config.js";
@@ -31,6 +33,9 @@ app.use("/users", userRoutes);
 //Importing the Post Routes
 import postRoutes from "./routes/postRoute.js";
 app.use("/posts", postRoutes);
+
+//swagger doc
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
