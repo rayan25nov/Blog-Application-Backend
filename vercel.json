@@ -8,11 +8,20 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api-docs/swagger-ui-bundle.js",
+      "dest": "/node_modules/swagger-ui-dist/swagger-ui-bundle.js"
+    },
+    {
+      "src": "/api-docs/swagger-ui-standalone-preset.js",
+      "dest": "/node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js"
+    },
+    {
+      "src": "/api-docs/(.*)",
       "dest": "/app.js"
     },
-    { "src": "/api-docs/(.*)", "dest": "swagger-ui-express", "status": 200 },
-    { "src": "/(.*)", "dest": "public/$1" }
-  ],
-  "rewrites": [{ "source": "/api/(.*)", "destination": "/api-docs/$1" }]
+    {
+      "src": "/(.*)",
+      "dest": "/app.js"
+    }
+  ]
 }

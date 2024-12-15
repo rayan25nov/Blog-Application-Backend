@@ -7,8 +7,6 @@ import fileUpload from "express-fileupload";
 dotenv.config();
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger.js";
-import path from "path";
-import { fileURLToPath } from "url";
 
 // Importing the Database Connection
 import dbConnection from "./db/config.js";
@@ -16,12 +14,6 @@ dbConnection();
 // Importing the Cloudinary Connection
 import cloudinaryConnect from "./db/cloudinary.js";
 cloudinaryConnect();
-
-// Serve static files if required (e.g., Swagger-UI assets)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const staticPath = path.resolve(__dirname, "public");
-app.use(express.static(staticPath));
 
 // Swagger setup
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
