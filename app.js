@@ -7,6 +7,12 @@ import fileUpload from "express-fileupload";
 dotenv.config();
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Get __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Importing the Database Connection
 import dbConnection from "./db/config.js";
@@ -14,6 +20,12 @@ dbConnection();
 // Importing the Cloudinary Connection
 import cloudinaryConnect from "./db/cloudinary.js";
 cloudinaryConnect();
+
+// Serve static files from node_modules/swagger-ui-dist
+app.use(
+  "/api-docs",
+  express.static(path.join(__dirname, "node_modules", "swagger-ui-dist"))
+);
 
 // Swagger setup
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
