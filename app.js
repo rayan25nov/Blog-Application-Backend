@@ -10,7 +10,6 @@ import swaggerSpec from "./swagger.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
-
 // Importing the Database Connection
 import dbConnection from "./db/config.js";
 dbConnection();
@@ -21,9 +20,10 @@ cloudinaryConnect();
 // Serve static files if required (e.g., Swagger-UI assets)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const staticPath = path.resolve(__dirname, "static");
+const staticPath = path.resolve(__dirname, "public");
 app.use(express.static(staticPath));
-//swagger doc
+
+// Swagger setup
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Middlewares
@@ -41,10 +41,9 @@ app.use(
 import userRoutes from "./routes/userRoute.js";
 app.use("/users", userRoutes);
 
-//Importing the Post Routes
+// Importing the Post Routes
 import postRoutes from "./routes/postRoute.js";
 app.use("/posts", postRoutes);
-
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

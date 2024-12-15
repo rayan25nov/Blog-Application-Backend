@@ -10,6 +10,9 @@
     {
       "src": "/(.*)",
       "dest": "/app.js"
-    }
-  ]
+    },
+    { "src": "/api-docs/(.*)", "dest": "swagger-ui-express", "status": 200 },
+    { "src": "/(.*)", "dest": "public/$1" }
+  ],
+  "rewrites": [{ "source": "/api/(.*)", "destination": "/api-docs/$1" }]
 }
