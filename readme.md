@@ -2,17 +2,19 @@
 
 This is the backend for a blog application that provides user authentication, post management, and other essential features. The application is built using Node.js, Express, and MongoDB and includes Swagger API documentation.
 
-## Table of Contents
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Folder Structure](#folder-structure)
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [API Documentation](#api-documentation)
-- [Scripts](#scripts)
-- [License](#license)
+## 📑 Table of Contents
 
-## Features
+- [Features](#-features)
+- [Technologies Used](#-technologies-used)
+- [Folder Structure](#-folder-structure)
+- [Installation](#-installation)
+- [Environment Variables](#-environment-variables)
+- [API Documentation](#-api-documentation)
+- [Scripts](#-scripts)
+- [License](#-license)
+
+## 🚀 Features
+
 - User Authentication and Authorization
   - Sign up, Sign in, and Password Reset functionality
 - Post Management
@@ -22,7 +24,8 @@ This is the backend for a blog application that provides user authentication, po
 - Token-based authentication using JWT
 - API documentation using Swagger
 
-## Technologies Used
+## 🛠️ Technologies Used
+
 - **Node.js**
 - **Express.js**
 - **MongoDB**
@@ -33,7 +36,8 @@ This is the backend for a blog application that provides user authentication, po
 - **Nodemailer**
 - **Swagger UI**
 
-## Folder Structure
+## 📂 Folder Structure
+
 ```
 └── 📁blog-backend
     └── 📁controllers
@@ -66,19 +70,22 @@ This is the backend for a blog application that provides user authentication, po
     └── vercel.json
 ```
 
-## Installation
+## ⚙️ Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/rayan25nov/Blog-Application-Backend.git
    ```
 
 2. Navigate to the project directory:
+
    ```bash
    cd blog-backend
    ```
 
 3. Install the dependencies:
+
    ```bash
    npm install
    ```
@@ -90,7 +97,7 @@ This is the backend for a blog application that provides user authentication, po
    npm run dev
    ```
 
-## Environment Variables
+## 📄 Environment Variables
 
 Create a `.env` file in the root directory and add the following variables:
 
@@ -108,20 +115,21 @@ API_KEY=your_cloudinary_api_key
 API_SECRET=your_cloudinary_api_secret
 ```
 
-## API Documentation
+## 📖 API Documentation
 
 Swagger documentation is available at `/api-docs`.
 
 To view the documentation:
+
 1. Start the server.
 2. Navigate to `http://localhost:8080/api-docs` in your browser.
 
-## Scripts
+## 🔧 Scripts
 
 - `npm run dev`: Start the server in development mode with Nodemon.
 - `npm start`: Start the server in production mode.
 
-## Dependencies
+## 📦 Dependencies
 
 Here are the major dependencies used in the project:
 
@@ -145,6 +153,6 @@ Here are the major dependencies used in the project:
 }
 ```
 
-## License
+## 📜 License
 
 This project is licensed under the ISC License.
