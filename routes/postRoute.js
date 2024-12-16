@@ -127,9 +127,12 @@ router.get("/:id", getPostById);
  *               title:
  *                 type: string
  *                 example: Updated Title
- *               content:
+ *               description:
  *                 type: string
  *                 example: Updated content of the blog post.
+ *               image:
+ *                 type: image
+ *                 example: img.jpeg
  *     responses:
  *       200:
  *         description: Blog post updated successfully
