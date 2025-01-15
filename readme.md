@@ -1,5 +1,7 @@
 # Blog Application Backend
 
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white) ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white) ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black) ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white) ![Multer](https://img.shields.io/badge/Multer-FF6F00?style=for-the-badge&logo=multer&logoColor=white) ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white) ![Nodemailer](https://img.shields.io/badge/Nodemailer-0A66C2?style=for-the-badge&logo=nodemailer&logoColor=white) ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge) ![GitHub repo size](https://img.shields.io/github/repo-size/rayan25nov/Blog-Application-Backend?style=for-the-badge) ![GitHub last commit](https://img.shields.io/github/last-commit/rayan25nov/Blog-Application-Backend?style=for-the-badge) ![GitHub issues](https://img.shields.io/github/issues/rayan25nov/Blog-Application-Backend?style=for-the-badge)
+
 This is the backend for a blog application that provides user authentication, post management, and other essential features. The application is built using Node.js, Express, and MongoDB and includes Swagger API documentation.
 
 ## 📑 Table of Contents
@@ -155,4 +157,4 @@ Here are the major dependencies used in the project:
 
 ## 📜 License
 
-This project is licensed under the ISC License.
+This project is licensed under the [MIT License](./LICENSE).
