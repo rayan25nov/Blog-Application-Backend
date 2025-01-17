@@ -3,6 +3,7 @@ const router = express.Router();
 import {
   signinHandler,
   signupHandler,
+  updateProfile,
   logoutHandler,
   verifyToken,
   getProfile,
@@ -135,6 +136,51 @@ router.get("/:id/verify/:token", verifyToken);
  *         description: Unauthorized
  */
 router.get("/profile", requireAuth, getProfile);
+
+/**
+ * @swagger
+ * /users/profile:
+ *   put:
+ *     summary: Update the authenticated user's profile
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 example: newPassword123
+ *               gender:
+ *                 type: string
+ *                 example: male
+ *               country:
+ *                 type: string
+ *                 example: USA
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal Server Error
+ */
+
+router.put("/profile", requireAuth, updateProfile);
 
 /**
  * @swagger

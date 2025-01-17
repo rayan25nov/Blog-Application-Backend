@@ -20,7 +20,9 @@ const requireAuth = async (req, res, next) => {
     next();
   } catch (error) {
     // console.log(error);
-    return res.status(401).json({ message: "Invalid token", success: false });
+    return res
+      .status(401)
+      .json({ message: "Invalid token", success: false, err: error.message });
   }
 };
 

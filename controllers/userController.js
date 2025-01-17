@@ -7,6 +7,7 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 dotenv.config();
+import cloudinaryMiddleware from "../middleware/cloudinaryMiddleware.js";
 
 // @desc      SignUp a user
 // @route     POST /users/signup
@@ -153,6 +154,77 @@ const signinHandler = async (req, res) => {
   } catch (err) {
     const errors = handleErrors(err);
     res.status(400).json({ errors, success: false });
+  }
+};
+
+// @desc      Update user profile
+// @route     PUT /users/profile
+// @access    Private  // VERIFIED
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { name, email, password, gender, country } = req.body;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    // Update user fields
+    if (name) user.name = name;
+    if (email) {
+      if (validator.isEmail(email) === false) {
+        return res.status(400).json({
+          errors: { email: "Invalid Email" },
+          success: false,
+        });
+      }
+      user.email = email;
+    }
+    if (password) {
+      if (password.length >= 6) {
+        user.password = await bcrypt.hash(password, 10);
+      } else {
+        return res.status(400).json({
+          errors: { password: "Password must be at least 6 characters" },
+          success: false,
+        });
+      }
+    }
+    if (gender) user.gender = gender;
+    if (country) user.country = country;
+
+    // Check if a new image file is provided in the request
+    const newImageFile = req.files?.image;
+    if (newImageFile) {
+      // Call the deleteImage middleware with async/await
+      await cloudinaryMiddleware.deleteImage(user.image);
+      // Call the uploadImage middleware with async/await
+      await cloudinaryMiddleware.uploadImage(req, res);
+      // Check if the upload was successful
+      const uploadResult = res.locals.uploadResult;
+      // Save the Cloudinary image URL to the updated post
+      user.image = uploadResult.imageUrl;
+    }
+
+    // Save the updated user
+    await user.save();
+
+    res.status(200).json({
+      message: "User profile updated successfully",
+      success: true,
+      user,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Something went wrong while updating user profile",
+      success: false,
+      error: err.message,
+    });
   }
 };
 
@@ -335,6 +407,7 @@ const resetPassword = async (req, res) => {
 export {
   signupHandler,
   signinHandler,
+  updateProfile,
   logoutHandler,
   verifyToken,
   getProfile,
