@@ -176,15 +176,6 @@ const updateProfile = async (req, res) => {
 
     // Update user fields
     if (name) user.name = name;
-    if (email) {
-      if (validator.isEmail(email) === false) {
-        return res.status(400).json({
-          errors: { email: "Invalid Email" },
-          success: false,
-        });
-      }
-      user.email = email;
-    }
     if (password) {
       if (password.length >= 6) {
         user.password = await bcrypt.hash(password, 10);
@@ -211,9 +202,52 @@ const updateProfile = async (req, res) => {
       user.image = uploadResult.imageUrl;
     }
 
+    if (email) {
+      if (validator.isEmail(email) === false) {
+        return res.status(400).json({
+          errors: { email: "Invalid Email" },
+          success: false,
+        });
+      }
+      // Check if the email is already taken
+      const emailExists = await User.find({ email: email });
+      console.log(emailExists);
+
+      if (emailExists.length > 0) {
+        return res.status(400).json({
+          errors: { email: "Email already taken" },
+          success: false,
+        });
+      }
+      // make the email verified false if email is changed
+      // send the verification email again
+      // create a token and save it to the database
+      if (email !== user.email) {
+        user.verified = false;
+        const token = await new Token({
+          userId: user._id,
+          token: crypto.randomBytes(32).toString("hex"),
+        }).save();
+        const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
+        await mailSender(
+          email,
+          "To complete your profile updation, please verify your email address by clicking the button below:",
+          url,
+          "Verify Email"
+        );
+      }
+      user.email = email;
+    }
     // Save the updated user
     await user.save();
 
+    if (user.verified === false) {
+      return res.status(200).json({
+        message: "An Email sent to your account please verify",
+        success: false,
+        logout: true,
+      });
+    }
     res.status(200).json({
       message: "User profile updated successfully",
       success: true,
